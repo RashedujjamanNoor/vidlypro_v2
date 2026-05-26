@@ -2,8 +2,65 @@ import { motion } from "framer-motion";
 
 import Container from "../common/Container";
 import MagneticButton from "../common/MagneticButton";
+import { useState } from "react";
+
+import axios from "axios";
+
+import toast from "react-hot-toast";
 
 const Contact = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    platform: "Instagram",
+    message: "",
+  });
+
+  const [sending, setSending] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (
+      !formData.name.trim() ||
+      !formData.email.trim() ||
+      !formData.message.trim()
+    ) {
+      toast.error("Please fill all required fields");
+
+      return;
+    }
+
+    try {
+      setSending(true);
+
+      await axios.post("https://formspree.io/f/mdajpgrn", formData, {
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      toast.success("Message sent successfully");
+
+      setFormData({
+        name: "",
+        email: "",
+        platform: "Instagram",
+        message: "",
+      });
+    } catch (error) {
+      toast.error("Failed to send message");
+    } finally {
+      setSending(false);
+    }
+  };
   return (
     <section id="contact" className="relative py-32 overflow-hidden">
       {/* Background Glow */}
@@ -106,7 +163,7 @@ const Contact = () => {
           >
             <h3 className="text-3xl font-black mb-8">Start Your Project</h3>
 
-            <form className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               {/* Name */}
               <div>
                 <label className="text-sm text-gray-400 block mb-2">
@@ -115,6 +172,9 @@ const Contact = () => {
 
                 <input
                   type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
                   placeholder="John Carter"
                   className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 outline-none focus:border-lime-400 transition"
                 />
@@ -128,6 +188,9 @@ const Contact = () => {
 
                 <input
                   type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   placeholder="john@email.com"
                   className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 outline-none focus:border-lime-400 transition"
                 />
@@ -139,7 +202,12 @@ const Contact = () => {
                   Main Platform
                 </label>
 
-                <select className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 outline-none focus:border-lime-400 transition">
+                <select
+                  name="platform"
+                  value={formData.platform}
+                  onChange={handleChange}
+                  className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 outline-none focus:border-lime-400 transition"
+                >
                   <option>Instagram</option>
                   <option>TikTok</option>
                   <option>YouTube Shorts</option>
@@ -154,6 +222,9 @@ const Contact = () => {
                 </label>
 
                 <textarea
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
                   rows="5"
                   placeholder="Tell us about your content goals..."
                   className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 outline-none focus:border-lime-400 transition resize-none"
@@ -162,10 +233,11 @@ const Contact = () => {
 
               {/* Submit */}
               <button
+                disabled={sending}
                 type="submit"
-                className="w-full bg-lime-400 text-black py-4 rounded-2xl font-bold hover:scale-[1.02] transition"
+                className="w-full bg-lime-400 text-black py-4 rounded-2xl font-bold hover:scale-[1.02] transition disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                Submit Inquiry
+                {sending ? "Sending..." : "Submit Inquiry"}
               </button>
             </form>
           </motion.div>
