@@ -6,7 +6,7 @@ const Footer = () => {
       <Container>
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div>
-            <h2 className="text-2xl font-bold">FITCUT</h2>
+            <h2 className="text-2xl font-bold">VIDLYPRO</h2>
             <p className="text-gray-400 mt-2">
               Premium video editing agency for fitness coaches.
             </p>
